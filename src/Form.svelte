@@ -89,6 +89,7 @@
     }
     #inputText {
       background-color: #041955;
+      color: white;
       border: none;
       padding: 0.5rem;
       margin: 15px;
