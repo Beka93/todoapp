@@ -1270,16 +1270,16 @@ var app = (function () {
     			create_component(fa1.$$.fragment);
     			t3 = space();
     			attr_dev(li, "contenteditable", "true");
-    			attr_dev(li, "class", li_class_value = "" + (null_to_empty(/*task*/ ctx[2].completed ? "completed" : "") + " svelte-lt8qfe"));
-    			add_location(li, file$1, 60, 14, 2092);
-    			add_location(button0, file$1, 62, 16, 2228);
-    			attr_dev(button1, "class", "deleteBtn svelte-lt8qfe");
-    			add_location(button1, file$1, 63, 16, 2333);
+    			attr_dev(li, "class", li_class_value = "" + (null_to_empty(/*task*/ ctx[2].completed ? "completed" : "") + " svelte-1yihrk9"));
+    			add_location(li, file$1, 60, 14, 2093);
+    			add_location(button0, file$1, 62, 16, 2229);
+    			attr_dev(button1, "class", "deleteBtn svelte-1yihrk9");
+    			add_location(button1, file$1, 63, 16, 2334);
     			attr_dev(div0, "class", "btn");
-    			add_location(div0, file$1, 61, 14, 2193);
+    			add_location(div0, file$1, 61, 14, 2194);
     			attr_dev(div1, "id", "list-task");
-    			attr_dev(div1, "class", "svelte-lt8qfe");
-    			add_location(div1, file$1, 59, 10, 2056);
+    			attr_dev(div1, "class", "svelte-1yihrk9");
+    			add_location(div1, file$1, 59, 10, 2057);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div1, anchor);
@@ -1317,7 +1317,7 @@ var app = (function () {
     			ctx = new_ctx;
     			if ((!current || dirty & /*todos*/ 1) && t0_value !== (t0_value = /*task*/ ctx[2].text + "")) set_data_dev(t0, t0_value);
 
-    			if (!current || dirty & /*todos*/ 1 && li_class_value !== (li_class_value = "" + (null_to_empty(/*task*/ ctx[2].completed ? "completed" : "") + " svelte-lt8qfe"))) {
+    			if (!current || dirty & /*todos*/ 1 && li_class_value !== (li_class_value = "" + (null_to_empty(/*task*/ ctx[2].completed ? "completed" : "") + " svelte-1yihrk9"))) {
     				attr_dev(li, "class", li_class_value);
     			}
     		},
@@ -1527,16 +1527,16 @@ var app = (function () {
     			create_component(fa1.$$.fragment);
     			t3 = space();
     			attr_dev(li, "contenteditable", "true");
-    			attr_dev(li, "class", li_class_value = "" + (null_to_empty(/*task*/ ctx[2].completed ? "completed" : "") + " svelte-lt8qfe"));
-    			add_location(li, file$1, 51, 12, 1636);
-    			add_location(button0, file$1, 53, 16, 1772);
-    			attr_dev(button1, "class", "deleteBtn svelte-lt8qfe");
-    			add_location(button1, file$1, 54, 16, 1877);
+    			attr_dev(li, "class", li_class_value = "" + (null_to_empty(/*task*/ ctx[2].completed ? "completed" : "") + " svelte-1yihrk9"));
+    			add_location(li, file$1, 51, 12, 1637);
+    			add_location(button0, file$1, 53, 16, 1773);
+    			attr_dev(button1, "class", "deleteBtn svelte-1yihrk9");
+    			add_location(button1, file$1, 54, 16, 1878);
     			attr_dev(div0, "class", "btn");
-    			add_location(div0, file$1, 52, 14, 1737);
+    			add_location(div0, file$1, 52, 14, 1738);
     			attr_dev(div1, "id", "list-task");
-    			attr_dev(div1, "class", "svelte-lt8qfe");
-    			add_location(div1, file$1, 50, 10, 1602);
+    			attr_dev(div1, "class", "svelte-1yihrk9");
+    			add_location(div1, file$1, 50, 10, 1603);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div1, anchor);
@@ -1574,7 +1574,7 @@ var app = (function () {
     			ctx = new_ctx;
     			if ((!current || dirty & /*todos*/ 1) && t0_value !== (t0_value = /*task*/ ctx[2].text + "")) set_data_dev(t0, t0_value);
 
-    			if (!current || dirty & /*todos*/ 1 && li_class_value !== (li_class_value = "" + (null_to_empty(/*task*/ ctx[2].completed ? "completed" : "") + " svelte-lt8qfe"))) {
+    			if (!current || dirty & /*todos*/ 1 && li_class_value !== (li_class_value = "" + (null_to_empty(/*task*/ ctx[2].completed ? "completed" : "") + " svelte-1yihrk9"))) {
     				attr_dev(li, "class", li_class_value);
     			}
     		},
@@ -1639,15 +1639,15 @@ var app = (function () {
     			button = element("button");
     			create_component(fa.$$.fragment);
     			t2 = space();
-    			attr_dev(li, "class", "completed svelte-lt8qfe");
-    			add_location(li, file$1, 42, 12, 1272);
-    			attr_dev(button, "class", "deleteBtn svelte-lt8qfe");
-    			add_location(button, file$1, 44, 16, 1361);
+    			attr_dev(li, "class", "completed svelte-1yihrk9");
+    			add_location(li, file$1, 42, 12, 1273);
+    			attr_dev(button, "class", "deleteBtn svelte-1yihrk9");
+    			add_location(button, file$1, 44, 16, 1362);
     			attr_dev(div0, "class", "btn");
-    			add_location(div0, file$1, 43, 14, 1326);
+    			add_location(div0, file$1, 43, 14, 1327);
     			attr_dev(div1, "id", "list-task");
-    			attr_dev(div1, "class", "svelte-lt8qfe");
-    			add_location(div1, file$1, 41, 10, 1238);
+    			attr_dev(div1, "class", "svelte-1yihrk9");
+    			add_location(div1, file$1, 41, 10, 1239);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div1, anchor);
@@ -1851,29 +1851,29 @@ var app = (function () {
     			attr_dev(input, "name", "inputText");
     			attr_dev(input, "id", "inputText");
     			attr_dev(input, "placeholder", "Write a new todo");
-    			attr_dev(input, "class", "svelte-lt8qfe");
-    			add_location(input, file$1, 21, 6, 547);
-    			attr_dev(button0, "class", "submit svelte-lt8qfe");
+    			attr_dev(input, "class", "svelte-1yihrk9");
+    			add_location(input, file$1, 21, 6, 567);
+    			attr_dev(button0, "class", "submit svelte-1yihrk9");
     			attr_dev(button0, "type", "submit");
-    			add_location(button0, file$1, 28, 6, 709);
+    			add_location(button0, file$1, 28, 6, 729);
     			attr_dev(form, "id", "toDoForm");
-    			attr_dev(form, "class", "svelte-lt8qfe");
+    			attr_dev(form, "class", "svelte-1yihrk9");
     			add_location(form, file$1, 20, 4, 519);
-    			attr_dev(button1, "class", "svelte-lt8qfe");
-    			add_location(button1, file$1, 31, 6, 842);
-    			attr_dev(button2, "class", "svelte-lt8qfe");
-    			add_location(button2, file$1, 32, 6, 900);
-    			attr_dev(button3, "class", "svelte-lt8qfe");
-    			add_location(button3, file$1, 33, 6, 970);
-    			attr_dev(div0, "class", "filters svelte-lt8qfe");
-    			add_location(div0, file$1, 30, 4, 813);
-    			attr_dev(main, "class", "form svelte-lt8qfe");
+    			attr_dev(button1, "class", "svelte-1yihrk9");
+    			add_location(button1, file$1, 31, 6, 843);
+    			attr_dev(button2, "class", "svelte-1yihrk9");
+    			add_location(button2, file$1, 32, 6, 901);
+    			attr_dev(button3, "class", "svelte-1yihrk9");
+    			add_location(button3, file$1, 33, 6, 971);
+    			attr_dev(div0, "class", "filters svelte-1yihrk9");
+    			add_location(div0, file$1, 30, 4, 814);
+    			attr_dev(main, "class", "form svelte-1yihrk9");
     			add_location(main, file$1, 19, 2, 494);
     			attr_dev(ul, "id", "list_container");
-    			add_location(ul, file$1, 37, 6, 1098);
+    			add_location(ul, file$1, 37, 6, 1099);
     			attr_dev(div1, "id", "todo_container");
-    			attr_dev(div1, "class", "svelte-lt8qfe");
-    			add_location(div1, file$1, 36, 2, 1065);
+    			attr_dev(div1, "class", "svelte-1yihrk9");
+    			add_location(div1, file$1, 36, 2, 1066);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -1906,7 +1906,7 @@ var app = (function () {
     			if (!mounted) {
     				dispose = [
     					listen_dev(input, "input", /*input_input_handler*/ ctx[5]),
-    					listen_dev(button0, "click", /*addTodo*/ ctx[3], false, false, false),
+    					listen_dev(form, "submit", /*addTodo*/ ctx[3], false, false, false),
     					listen_dev(button1, "click", /*click_handler*/ ctx[6], false, false, false),
     					listen_dev(button2, "click", /*click_handler_1*/ ctx[7], false, false, false),
     					listen_dev(button3, "click", /*click_handler_2*/ ctx[8], false, false, false)
@@ -2110,7 +2110,7 @@ var app = (function () {
     			t1 = space();
     			create_component(form.$$.fragment);
     			attr_dev(h1, "class", "svelte-rtn3eg");
-    			add_location(h1, file, 4, 2, 71);
+    			add_location(h1, file, 4, 2, 75);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");

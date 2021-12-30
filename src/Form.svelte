@@ -18,7 +18,7 @@
   
   
   <main class="form">
-    <form id="toDoForm">
+    <form id="toDoForm" on:submit={addTodo}>
       <input
         bind:value={task}
         type="text"
@@ -26,7 +26,7 @@
         id="inputText"
         placeholder="Write a new todo"
       />
-      <button class="submit" type="submit" on:click={addTodo}><Fa icon={faPlus} /></button>
+      <button class="submit" type="submit"><Fa icon={faPlus} /></button>
     </form>
     <div class="filters">
       <button on:click={()=>{filter='all'}}>All</button>
