@@ -27,8 +27,27 @@ var app = (function () {
     function is_empty(obj) {
         return Object.keys(obj).length === 0;
     }
+    function validate_store(store, name) {
+        if (store != null && typeof store.subscribe !== 'function') {
+            throw new Error(`'${name}' is not a store with a 'subscribe' method`);
+        }
+    }
+    function subscribe(store, ...callbacks) {
+        if (store == null) {
+            return noop;
+        }
+        const unsub = store.subscribe(...callbacks);
+        return unsub.unsubscribe ? () => unsub.unsubscribe() : unsub;
+    }
+    function component_subscribe(component, store, callback) {
+        component.$$.on_destroy.push(subscribe(store, callback));
+    }
     function null_to_empty(value) {
         return value == null ? '' : value;
+    }
+    function set_store_value(store, ret, value) {
+        store.set(value);
+        return ret;
     }
     function append(target, node) {
         target.appendChild(node);
@@ -85,6 +104,14 @@ var app = (function () {
     let current_component;
     function set_current_component(component) {
         current_component = component;
+    }
+    function get_current_component() {
+        if (!current_component)
+            throw new Error('Function called outside component initialization');
+        return current_component;
+    }
+    function onMount(fn) {
+        get_current_component().$$.on_mount.push(fn);
     }
 
     const dirty_components = [];
@@ -410,6 +437,67 @@ var app = (function () {
         }
         $capture_state() { }
         $inject_state() { }
+    }
+
+    const subscriber_queue = [];
+    /**
+     * Create a `Writable` store that allows both updating and reading by subscription.
+     * @param {*=}value initial value
+     * @param {StartStopNotifier=}start start and stop notifications for subscriptions
+     */
+    function writable(value, start = noop) {
+        let stop;
+        const subscribers = new Set();
+        function set(new_value) {
+            if (safe_not_equal(value, new_value)) {
+                value = new_value;
+                if (stop) { // store is ready
+                    const run_queue = !subscriber_queue.length;
+                    for (const subscriber of subscribers) {
+                        subscriber[1]();
+                        subscriber_queue.push(subscriber, value);
+                    }
+                    if (run_queue) {
+                        for (let i = 0; i < subscriber_queue.length; i += 2) {
+                            subscriber_queue[i][0](subscriber_queue[i + 1]);
+                        }
+                        subscriber_queue.length = 0;
+                    }
+                }
+            }
+        }
+        function update(fn) {
+            set(fn(value));
+        }
+        function subscribe(run, invalidate = noop) {
+            const subscriber = [run, invalidate];
+            subscribers.add(subscriber);
+            if (subscribers.size === 1) {
+                stop = start(set) || noop;
+            }
+            run(value);
+            return () => {
+                subscribers.delete(subscriber);
+                if (subscribers.size === 0) {
+                    stop();
+                    stop = null;
+                }
+            };
+        }
+        return { set, update, subscribe };
+    }
+
+    // Stores each To-Do list item
+    const todos = writable([]);
+
+    class LocalStorage {
+      static async getAll() {
+        return JSON.parse(localStorage.getItem("todos") || "[]");
+      }
+
+      static async save(todos) {
+        localStorage.setItem("todos", JSON.stringify(todos));
+      }
     }
 
     const parseNumber = parseFloat;
@@ -1227,7 +1315,7 @@ var app = (function () {
     	return child_ctx;
     }
 
-    // (59:10) {:else}
+    // (68:10) {:else}
     function create_else_block(ctx) {
     	let div1;
     	let li;
@@ -1271,15 +1359,15 @@ var app = (function () {
     			t3 = space();
     			attr_dev(li, "contenteditable", "true");
     			attr_dev(li, "class", li_class_value = "" + (null_to_empty(/*task*/ ctx[2].completed ? "completed" : "") + " svelte-1yihrk9"));
-    			add_location(li, file$1, 60, 14, 2093);
-    			add_location(button0, file$1, 62, 16, 2229);
+    			add_location(li, file$1, 69, 14, 2376);
+    			add_location(button0, file$1, 71, 16, 2512);
     			attr_dev(button1, "class", "deleteBtn svelte-1yihrk9");
-    			add_location(button1, file$1, 63, 16, 2334);
+    			add_location(button1, file$1, 72, 16, 2617);
     			attr_dev(div0, "class", "btn");
-    			add_location(div0, file$1, 61, 14, 2194);
+    			add_location(div0, file$1, 70, 14, 2477);
     			attr_dev(div1, "id", "list-task");
     			attr_dev(div1, "class", "svelte-1yihrk9");
-    			add_location(div1, file$1, 59, 10, 2057);
+    			add_location(div1, file$1, 68, 10, 2340);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div1, anchor);
@@ -1315,9 +1403,9 @@ var app = (function () {
     		},
     		p: function update(new_ctx, dirty) {
     			ctx = new_ctx;
-    			if ((!current || dirty & /*todos*/ 1) && t0_value !== (t0_value = /*task*/ ctx[2].text + "")) set_data_dev(t0, t0_value);
+    			if ((!current || dirty & /*$todos*/ 2) && t0_value !== (t0_value = /*task*/ ctx[2].text + "")) set_data_dev(t0, t0_value);
 
-    			if (!current || dirty & /*todos*/ 1 && li_class_value !== (li_class_value = "" + (null_to_empty(/*task*/ ctx[2].completed ? "completed" : "") + " svelte-1yihrk9"))) {
+    			if (!current || dirty & /*$todos*/ 2 && li_class_value !== (li_class_value = "" + (null_to_empty(/*task*/ ctx[2].completed ? "completed" : "") + " svelte-1yihrk9"))) {
     				attr_dev(li, "class", li_class_value);
     			}
     		},
@@ -1345,14 +1433,14 @@ var app = (function () {
     		block,
     		id: create_else_block.name,
     		type: "else",
-    		source: "(59:10) {:else}",
+    		source: "(68:10) {:else}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (49:44) 
+    // (58:44) 
     function create_if_block_2(ctx) {
     	let if_block_anchor;
     	let current;
@@ -1373,7 +1461,7 @@ var app = (function () {
     				if (if_block) {
     					if_block.p(ctx, dirty);
 
-    					if (dirty & /*todos*/ 1) {
+    					if (dirty & /*$todos*/ 2) {
     						transition_in(if_block, 1);
     					}
     				} else {
@@ -1411,14 +1499,14 @@ var app = (function () {
     		block,
     		id: create_if_block_2.name,
     		type: "if",
-    		source: "(49:44) ",
+    		source: "(58:44) ",
     		ctx
     	});
 
     	return block;
     }
 
-    // (40:10) {#if filter == 'completed'}
+    // (49:10) {#if filter == 'completed'}
     function create_if_block(ctx) {
     	let if_block_anchor;
     	let current;
@@ -1439,7 +1527,7 @@ var app = (function () {
     				if (if_block) {
     					if_block.p(ctx, dirty);
 
-    					if (dirty & /*todos*/ 1) {
+    					if (dirty & /*$todos*/ 2) {
     						transition_in(if_block, 1);
     					}
     				} else {
@@ -1477,14 +1565,14 @@ var app = (function () {
     		block,
     		id: create_if_block.name,
     		type: "if",
-    		source: "(40:10) {#if filter == 'completed'}",
+    		source: "(49:10) {#if filter == 'completed'}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (50:10) {#if !task.completed}
+    // (59:10) {#if !task.completed}
     function create_if_block_3(ctx) {
     	let div1;
     	let li;
@@ -1528,15 +1616,15 @@ var app = (function () {
     			t3 = space();
     			attr_dev(li, "contenteditable", "true");
     			attr_dev(li, "class", li_class_value = "" + (null_to_empty(/*task*/ ctx[2].completed ? "completed" : "") + " svelte-1yihrk9"));
-    			add_location(li, file$1, 51, 12, 1637);
-    			add_location(button0, file$1, 53, 16, 1773);
+    			add_location(li, file$1, 60, 12, 1920);
+    			add_location(button0, file$1, 62, 16, 2056);
     			attr_dev(button1, "class", "deleteBtn svelte-1yihrk9");
-    			add_location(button1, file$1, 54, 16, 1878);
+    			add_location(button1, file$1, 63, 16, 2161);
     			attr_dev(div0, "class", "btn");
-    			add_location(div0, file$1, 52, 14, 1738);
+    			add_location(div0, file$1, 61, 14, 2021);
     			attr_dev(div1, "id", "list-task");
     			attr_dev(div1, "class", "svelte-1yihrk9");
-    			add_location(div1, file$1, 50, 10, 1603);
+    			add_location(div1, file$1, 59, 10, 1886);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div1, anchor);
@@ -1572,9 +1660,9 @@ var app = (function () {
     		},
     		p: function update(new_ctx, dirty) {
     			ctx = new_ctx;
-    			if ((!current || dirty & /*todos*/ 1) && t0_value !== (t0_value = /*task*/ ctx[2].text + "")) set_data_dev(t0, t0_value);
+    			if ((!current || dirty & /*$todos*/ 2) && t0_value !== (t0_value = /*task*/ ctx[2].text + "")) set_data_dev(t0, t0_value);
 
-    			if (!current || dirty & /*todos*/ 1 && li_class_value !== (li_class_value = "" + (null_to_empty(/*task*/ ctx[2].completed ? "completed" : "") + " svelte-1yihrk9"))) {
+    			if (!current || dirty & /*$todos*/ 2 && li_class_value !== (li_class_value = "" + (null_to_empty(/*task*/ ctx[2].completed ? "completed" : "") + " svelte-1yihrk9"))) {
     				attr_dev(li, "class", li_class_value);
     			}
     		},
@@ -1602,14 +1690,14 @@ var app = (function () {
     		block,
     		id: create_if_block_3.name,
     		type: "if",
-    		source: "(50:10) {#if !task.completed}",
+    		source: "(59:10) {#if !task.completed}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (41:10) {#if task.completed}
+    // (50:10) {#if task.completed}
     function create_if_block_1(ctx) {
     	let div1;
     	let li;
@@ -1640,14 +1728,14 @@ var app = (function () {
     			create_component(fa.$$.fragment);
     			t2 = space();
     			attr_dev(li, "class", "completed svelte-1yihrk9");
-    			add_location(li, file$1, 42, 12, 1273);
+    			add_location(li, file$1, 51, 12, 1556);
     			attr_dev(button, "class", "deleteBtn svelte-1yihrk9");
-    			add_location(button, file$1, 44, 16, 1362);
+    			add_location(button, file$1, 53, 16, 1645);
     			attr_dev(div0, "class", "btn");
-    			add_location(div0, file$1, 43, 14, 1327);
+    			add_location(div0, file$1, 52, 14, 1610);
     			attr_dev(div1, "id", "list-task");
     			attr_dev(div1, "class", "svelte-1yihrk9");
-    			add_location(div1, file$1, 41, 10, 1239);
+    			add_location(div1, file$1, 50, 10, 1522);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div1, anchor);
@@ -1677,7 +1765,7 @@ var app = (function () {
     		},
     		p: function update(new_ctx, dirty) {
     			ctx = new_ctx;
-    			if ((!current || dirty & /*todos*/ 1) && t0_value !== (t0_value = /*task*/ ctx[2].text + "")) set_data_dev(t0, t0_value);
+    			if ((!current || dirty & /*$todos*/ 2) && t0_value !== (t0_value = /*task*/ ctx[2].text + "")) set_data_dev(t0, t0_value);
     		},
     		i: function intro(local) {
     			if (current) return;
@@ -1700,14 +1788,14 @@ var app = (function () {
     		block,
     		id: create_if_block_1.name,
     		type: "if",
-    		source: "(41:10) {#if task.completed}",
+    		source: "(50:10) {#if task.completed}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (39:10) {#each todos as task}
+    // (48:10) {#each $todos as task}
     function create_each_block(ctx) {
     	let current_block_type_index;
     	let if_block;
@@ -1717,8 +1805,8 @@ var app = (function () {
     	const if_blocks = [];
 
     	function select_block_type(ctx, dirty) {
-    		if (/*filter*/ ctx[1] == 'completed') return 0;
-    		if (/*filter*/ ctx[1] == 'uncompleted') return 1;
+    		if (/*filter*/ ctx[0] == 'completed') return 0;
+    		if (/*filter*/ ctx[0] == 'uncompleted') return 1;
     		return 2;
     	}
 
@@ -1781,7 +1869,7 @@ var app = (function () {
     		block,
     		id: create_each_block.name,
     		type: "each",
-    		source: "(39:10) {#each todos as task}",
+    		source: "(48:10) {#each $todos as task}",
     		ctx
     	});
 
@@ -1809,7 +1897,7 @@ var app = (function () {
     	let mounted;
     	let dispose;
     	fa = new Fa$1({ props: { icon: faPlus }, $$inline: true });
-    	let each_value = /*todos*/ ctx[0];
+    	let each_value = /*$todos*/ ctx[1];
     	validate_each_argument(each_value);
     	let each_blocks = [];
 
@@ -1852,28 +1940,28 @@ var app = (function () {
     			attr_dev(input, "id", "inputText");
     			attr_dev(input, "placeholder", "Write a new todo");
     			attr_dev(input, "class", "svelte-1yihrk9");
-    			add_location(input, file$1, 21, 6, 567);
+    			add_location(input, file$1, 30, 6, 849);
     			attr_dev(button0, "class", "submit svelte-1yihrk9");
     			attr_dev(button0, "type", "submit");
-    			add_location(button0, file$1, 28, 6, 729);
+    			add_location(button0, file$1, 37, 6, 1011);
     			attr_dev(form, "id", "toDoForm");
     			attr_dev(form, "class", "svelte-1yihrk9");
-    			add_location(form, file$1, 20, 4, 519);
+    			add_location(form, file$1, 29, 4, 801);
     			attr_dev(button1, "class", "svelte-1yihrk9");
-    			add_location(button1, file$1, 31, 6, 843);
+    			add_location(button1, file$1, 40, 6, 1125);
     			attr_dev(button2, "class", "svelte-1yihrk9");
-    			add_location(button2, file$1, 32, 6, 901);
+    			add_location(button2, file$1, 41, 6, 1183);
     			attr_dev(button3, "class", "svelte-1yihrk9");
-    			add_location(button3, file$1, 33, 6, 971);
+    			add_location(button3, file$1, 42, 6, 1253);
     			attr_dev(div0, "class", "filters svelte-1yihrk9");
-    			add_location(div0, file$1, 30, 4, 814);
+    			add_location(div0, file$1, 39, 4, 1096);
     			attr_dev(main, "class", "form svelte-1yihrk9");
-    			add_location(main, file$1, 19, 2, 494);
+    			add_location(main, file$1, 28, 2, 776);
     			attr_dev(ul, "id", "list_container");
-    			add_location(ul, file$1, 37, 6, 1099);
+    			add_location(ul, file$1, 46, 6, 1381);
     			attr_dev(div1, "id", "todo_container");
     			attr_dev(div1, "class", "svelte-1yihrk9");
-    			add_location(div1, file$1, 36, 2, 1066);
+    			add_location(div1, file$1, 45, 2, 1348);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -1920,8 +2008,8 @@ var app = (function () {
     				set_input_value(input, /*task*/ ctx[2]);
     			}
 
-    			if (dirty & /*deleteTodo, todos, faTrashAlt, filter, faCheck*/ 19) {
-    				each_value = /*todos*/ ctx[0];
+    			if (dirty & /*deleteTodo, $todos, faTrashAlt, filter, faCheck*/ 19) {
+    				each_value = /*$todos*/ ctx[1];
     				validate_each_argument(each_value);
     				let i;
 
@@ -1991,30 +2079,42 @@ var app = (function () {
     }
 
     function instance$1($$self, $$props, $$invalidate) {
+    	let $todos;
+    	validate_store(todos, 'todos');
+    	component_subscribe($$self, todos, $$value => $$invalidate(1, $todos = $$value));
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots('Form', slots, []);
-    	let todos = [];
     	let task = '';
     	let filter = '';
 
     	const addTodo = e => {
     		e.preventDefault();
 
-    		if (task) $$invalidate(0, todos = [
-    			...todos,
-    			{
-    				text: task,
-    				completed: false,
-    				id: Math.random() * 1000
-    			}
-    		]);
+    		if (task) set_store_value(
+    			todos,
+    			$todos = [
+    				...$todos,
+    				{
+    					text: task,
+    					completed: false,
+    					id: Math.random() * 100
+    				}
+    			],
+    			$todos
+    		);
 
     		$$invalidate(2, task = '');
+    		LocalStorage.save($todos);
     	};
 
     	const deleteTodo = id => {
-    		$$invalidate(0, todos = todos.filter(task => task.id !== id));
+    		set_store_value(todos, $todos = $todos.filter(task => task.id !== id), $todos);
+    		LocalStorage.save($todos);
     	};
+
+    	onMount(async () => {
+    		set_store_value(todos, $todos = await LocalStorage.getAll(), $todos);
+    	});
 
     	const writable_props = [];
 
@@ -2028,36 +2128,38 @@ var app = (function () {
     	}
 
     	const click_handler = () => {
-    		$$invalidate(1, filter = 'all');
+    		$$invalidate(0, filter = 'all');
     	};
 
     	const click_handler_1 = () => {
-    		$$invalidate(1, filter = 'completed');
+    		$$invalidate(0, filter = 'completed');
     	};
 
     	const click_handler_2 = () => {
-    		$$invalidate(1, filter = 'uncompleted');
+    		$$invalidate(0, filter = 'uncompleted');
     	};
 
-    	const click_handler_3 = (task, each_value, task_index) => $$invalidate(0, each_value[task_index].completed = !task.completed, todos);
-    	const click_handler_4 = (task, each_value, task_index) => $$invalidate(0, each_value[task_index].completed = !task.completed, todos);
+    	const click_handler_3 = (task, each_value, task_index) => set_store_value(todos, each_value[task_index].completed = !task.completed, $todos);
+    	const click_handler_4 = (task, each_value, task_index) => set_store_value(todos, each_value[task_index].completed = !task.completed, $todos);
 
     	$$self.$capture_state = () => ({
+    		onMount,
+    		todos,
+    		LocalStorage,
     		Fa: Fa$1,
     		faCheck,
     		faPlus,
     		faTrashAlt,
-    		todos,
     		task,
     		filter,
     		addTodo,
-    		deleteTodo
+    		deleteTodo,
+    		$todos
     	});
 
     	$$self.$inject_state = $$props => {
-    		if ('todos' in $$props) $$invalidate(0, todos = $$props.todos);
     		if ('task' in $$props) $$invalidate(2, task = $$props.task);
-    		if ('filter' in $$props) $$invalidate(1, filter = $$props.filter);
+    		if ('filter' in $$props) $$invalidate(0, filter = $$props.filter);
     	};
 
     	if ($$props && "$$inject" in $$props) {
@@ -2065,8 +2167,8 @@ var app = (function () {
     	}
 
     	return [
-    		todos,
     		filter,
+    		$todos,
     		task,
     		addTodo,
     		deleteTodo,

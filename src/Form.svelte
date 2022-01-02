@@ -1,19 +1,28 @@
 <script>
+    import { onMount } from "svelte";
+    import { todos } from "./stores";
+    import LocalStorage from "./Localstorage.js";
+
     import Fa from "svelte-fa/src/fa.svelte";
     import { faCheck, faPlus, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
-    let todos = [];
+    // let todos = [];
     let task = '';
     let filter = '';
   
-  const addTodo = (e) => {
-    e.preventDefault();
+    const addTodo = (e) => {
+    e.preventDefault();   
     if(task)
-    todos = [...todos, {text: task, completed: false, id: Math.random() * 1000}];
+    $todos = [...$todos, {text: task, completed: false, id: Math.random() * 100}];
       task = '';
+      LocalStorage.save($todos);
   }
   const deleteTodo = (id) => {
-    todos = todos.filter(task => task.id !== id);
+   $todos = $todos.filter(task => task.id !== id);
+    LocalStorage.save($todos);
   }
+  onMount(async () => {
+    $todos = await LocalStorage.getAll();
+  });
   </script>
   
   
@@ -36,7 +45,7 @@
   </main>
   <div id="todo_container">
       <ul id="list_container">
-          {#each todos as task}
+          {#each $todos as task}
           {#if filter == 'completed'}
           {#if task.completed}
           <div id="list-task">
