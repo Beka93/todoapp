@@ -1,33 +1,25 @@
 <script>
-    import { onMount } from "svelte";
     import { todos } from "./stores";
-    import LocalStorage from "./Localstorage.js";
+    import { displayTodos } from "./stores";
+    import { filter } from "./stores";  
 
     import Fa from "svelte-fa/src/fa.svelte";
     import { faCheck, faPlus, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
-    // let todos = [];
+
     let task = '';
-    let filter = '';
-  
-    const addTodo = (e) => {
-    e.preventDefault();   
-    if(task)
-    $todos = [...$todos, {text: task, completed: false, id: Math.random() * 100}];
-      task = '';
-      LocalStorage.save($todos);
-  }
-  const deleteTodo = (id) => {
-   $todos = $todos.filter(task => task.id !== id);
-    LocalStorage.save($todos);
-  }
-  onMount(async () => {
-    $todos = await LocalStorage.getAll();
-  });
   </script>
   
   
   <main class="form">
-    <form id="toDoForm" on:submit={addTodo}>
+    <form
+      id="toDoForm"
+      on:submit|preventDefault={() => {
+        if (task) {
+          todos.addTodo(task);
+        }
+        task = "";
+      }}
+    >
       <input
         bind:value={task}
         type="text"
@@ -38,44 +30,33 @@
       <button class="submit" type="submit"><Fa icon={faPlus} /></button>
     </form>
     <div class="filters">
-      <button on:click={()=>{filter='all'}}>All</button>
-      <button on:click={()=>{filter='completed'}}>Completed</button>
-      <button on:click={()=>{filter='uncompleted'}}>Uncompleted</button>
+      <button on:click={()=>{$filter='all'}}>All</button>
+      <button on:click={()=>{$filter='completed'}}>Completed</button>
+      <button on:click={()=>{$filter='uncompleted'}}>Uncompleted</button>
       </div>
   </main>
   <div id="todo_container">
-      <ul id="list_container">
-          {#each $todos as task}
-          {#if filter == 'completed'}
-          {#if task.completed}
-          <div id="list-task">
-            <li class="completed">{task.text}</li>
-              <div class="btn">
-                <button class="deleteBtn" on:click={deleteTodo(task.id)}><Fa icon={faTrashAlt}/></button>
-              </div>
-            </div>
-            {/if}
-          {:else if filter == 'uncompleted'}
-          {#if !task.completed}
-          <div id="list-task">
-            <li contenteditable="true" class={task.completed ? "completed" : ""}>{task.text}</li>
-              <div class="btn">
-                <button on:click={() => task.completed = !task.completed}><Fa icon={faCheck}/></button>
-                <button class="deleteBtn" on:click={deleteTodo(task.id)}><Fa icon={faTrashAlt}/></button>
-              </div>
-            </div>
-          {/if}
-          {:else}
-          <div id="list-task">
-              <li contenteditable="true" class={task.completed ? "completed" : ""}>{task.text}</li>
-              <div class="btn">
-                <button on:click={() => task.completed = !task.completed}><Fa icon={faCheck}/></button>
-                <button class="deleteBtn" on:click={deleteTodo(task.id)}><Fa icon={faTrashAlt}/></button>
-              </div>
-            </div>
-          {/if}
-          {/each}
-      </ul>
+    <ul id="list_container">
+      {#each $displayTodos as task}
+        <div id="list-task">
+          <li
+            contenteditable="true"
+            bind:textContent={task.text}
+            class={task.completed ? "completed" : ""}
+          >
+            {task.text}
+          </li>
+          <div class="btn">
+            <button on:click={() => (task.completed = !task.completed)}
+              ><Fa icon={faCheck} /></button
+            >
+            <button class="deleteBtn" on:click={todos.deleteTodo(task.id)}
+              ><Fa icon={faTrashAlt} /></button
+            >
+          </div>
+        </div>
+      {/each}
+    </ul>
   </div>
   
   <style>
