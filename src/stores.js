@@ -13,6 +13,15 @@ const todoStores = () => {
     deleteTodo: (id) => {
       update((oldTasks) => oldTasks.filter((task) => task.id !== id));
     },
+    toggleCompleted: (id) => { 
+      update((oldTasks) => { oldTasks.forEach(function(task, index){
+      if (task.id === id){
+        oldTasks[index].completed = !oldTasks[index].completed;
+         }
+        })
+        {return oldTasks;}
+      })
+    },
     set
   };
 };
@@ -42,11 +51,11 @@ const displayTodos = derived([todos, filter, search], ([$todos, $filter, $search
   return $todos.filter((task) => {
     switch ($filter) {
       case "completed":
-        return task.completed && task.text.includes($search);
+        return task.completed && task.text.toLowerCase().includes($search.toLowerCase());
       case "uncompleted":
-        return !task.completed && task.text.includes($search);
+        return !task.completed && task.text.toLowerCase().includes($search.toLowerCase());
       default:
-        return task.text.includes($search);
+        return task.text.toLowerCase().includes($search.toLowerCase());
     }
   });
 });

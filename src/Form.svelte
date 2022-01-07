@@ -5,6 +5,7 @@
     faCheck,
     faPlus,
     faTrashAlt,
+    faSortAlphaDown,
   } from "@fortawesome/free-solid-svg-icons";
 
   let task = "";
@@ -65,6 +66,7 @@
   </div>
   <div class="search">
     <input id="search" type="text" placeholder="search" bind:value={$search} />
+    <button class="sort"><Fa icon={faSortAlphaDown} /></button>
   </div>
 </main>
 <div id="todo_container">
@@ -79,7 +81,7 @@
           {task.text}
         </li>
         <div class="btn">
-          <button on:click={() => (task.completed = !task.completed)}
+          <button on:click={todos.toggleCompleted(task.id)}
             ><Fa icon={faCheck} /></button
           >
           <button class="deleteBtn" on:click={todos.deleteTodo(task.id)}
@@ -98,13 +100,17 @@
     align-items: center;
     padding-bottom: 30px;
   }
-  .submit {
+  .submit,
+  .sort {
     background-color: #eb06ff;
     color: white;
     border: none;
     border-radius: 50%;
     margin: 0;
     padding: 0.5rem 0.75rem;
+  }
+  .sort {
+    border-radius: 10%;
   }
   #toDoForm {
     margin-bottom: 15px;
