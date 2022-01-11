@@ -1,6 +1,7 @@
 <script>
   import { todos, displayTodos, filter, search } from "./stores";
   import Fa from "svelte-fa/src/fa.svelte";
+  import { tick } from "svelte";
   import {
     faCheck,
     faPlus,
@@ -64,7 +65,12 @@
   </div>
   <div class="search">
     <input id="search" type="text" placeholder="search" bind:value={$search} />
-    <button on:click={todos.sortTodos()} class="sort"><Fa icon={faSortAlphaDown} /></button>
+        <button
+      on:click={async () => {
+        todos.sortTodos();
+        await tick();
+      }}
+      class="sort"><Fa icon={faSortAlphaDown} /></button>
   </div>
 </main>
 <div id="todo_container">
