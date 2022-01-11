@@ -18,11 +18,9 @@
   //       { text: task, completed: false, id: Math.random() * 100 },
   //     ];
   //   task = "";
-  //   LocalStorage.save($todos);
   // };
   // const deleteTodo = (id) => {
   //   $todos = $todos.filter((task) => task.id !== id);
-  //   LocalStorage.save($todos);
   // };
 
   $: console.log($search);
@@ -66,7 +64,7 @@
   </div>
   <div class="search">
     <input id="search" type="text" placeholder="search" bind:value={$search} />
-    <button class="sort"><Fa icon={faSortAlphaDown} /></button>
+    <button on:click={todos.sortTodos()} class="sort"><Fa icon={faSortAlphaDown} /></button>
   </div>
 </main>
 <div id="todo_container">
@@ -84,7 +82,7 @@
           <button on:click={todos.toggleCompleted(task.id)}
             ><Fa icon={faCheck} /></button
           >
-          <button class="deleteBtn" on:click={todos.deleteTodo(task.id)}
+          <button class="deleteBtn" on:click={todos.deleteTodo(task)}
             ><Fa icon={faTrashAlt} /></button
           >
         </div>
@@ -102,7 +100,7 @@
   }
   .submit,
   .sort {
-    background-color: #eb06ff;
+    background-color: #9a10a7;
     color: white;
     border: none;
     border-radius: 50%;
