@@ -10,8 +10,14 @@ const todoStores = () => {
         { text: task, completed: false, id: Math.random() * 100 },
       ]);
     },
-    deleteTodo: (id) => {
-      update((oldTasks) => oldTasks.filter((task) => task.id !== id));
+    // deleteTodo: (id) => {
+    //   update((oldTasks) => oldTasks.filter((task) => task.id !== id));
+    // },
+    deleteTodo: (task) => {
+      update((oldTasks) => { 
+        oldTasks.splice(oldTasks.indexOf(task),1);
+        return oldTasks;
+      });
     },
     toggleCompleted: (id) => { 
       update((oldTasks) => { oldTasks.forEach(function(task, index){
@@ -19,8 +25,14 @@ const todoStores = () => {
         oldTasks[index].completed = !oldTasks[index].completed;
          }
         })
-        {return oldTasks;}
+        return oldTasks;
       })
+    },
+    sortTodos: () => {
+      update((oldTasks) => oldTasks.sort(function(a,b){
+          return a.text.localeCompare(b.text);
+        })
+      )
     },
     set
   };
